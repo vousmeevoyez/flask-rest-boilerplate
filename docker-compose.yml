@@ -1,8 +1,34 @@
-# Docker Compose Base
+# Docker Compose Production Environments 
 version : '3'
 services:
+
         flask:
                 build:
                         context: .
                         dockerfile: dockerfiles/flask/Dockerfile
                 image: flask-rest-services
+                entrypoint: ./scripts/build.sh
+                environment:
+                - DB_USERNAME=$DB_USERNAME
+                - DB_PASSWORD=$DB_PASSWORD
+                - DB_HOSTNAME=$DB_HOSTNAME
+                - DB_NAME=$DB_NAME
+                - DB_PORT=$DB_PORT
+                - ENVIRONMENT=$ENVIRONMENT
+                - HOST=$HOST
+                ports:
+                - 5000:5000
+                depends_on:
+                - mongo
+                restart: always
+
+        mongo:
+                build:
+                        context: dockerfiles/mongo/
+                environment:
+                - MONGO_INITDB_ROOT_USERNAME=$DB_ROOT_USERNAME
+                - MONGO_INITDB_ROOT_PASSWORD=$DB_ROOT_PASSWORD
+                - MONGO_INITDB_DATABASE=$DB_NAME
+                restart: always
+volumes:
+        db_volume:
